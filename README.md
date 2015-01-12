@@ -15,9 +15,10 @@ This module can now be installed using ``pip``.
 ##Usage
 This module can be used in a program in the following way:
 
-	:::python
-    import markdown
-	html = markdown.markdown(source, extensions=[markdown_include.include'])
+```python
+import markdown
+html = markdown.markdown(source, extensions=['markdown_include.include'])
+```
 
 The syntax for use within your Markdown files is ``{{filename}}``. This
 statement will be replaced by the contents of ``filename``. Markdown-Include

@@ -7,9 +7,9 @@ LaTeX (and also the C pre-processor and Fortran). I originally wrote it for my
 
 
 ##Installation
-Place the ``markdown_include`` directory somewhere in your PYTHONPATH.
-Hopefully in the near future this module will be available on PyPI and can be
-installed using pip.
+This module can now be installed using ``pip``.
+
+    pip install markdown-include
 
 
 ##Usage

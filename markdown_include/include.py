@@ -29,7 +29,7 @@ from markdown.preprocessors import Preprocessor
 import re
 import os.path
 
-INC_SYNTAX = re.compile(r'\{\{\s*(.+?)\s*\}\}')
+INC_SYNTAX = re.compile(r'\{!\s*(.+?)\s*!\}')
 
 
 class MarkdownInclude(Extension):

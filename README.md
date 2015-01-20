@@ -22,7 +22,7 @@ html = markdown.markdown(source, extensions=['markdown_include.include'])
 
 The syntax for use within your Markdown files is ``{!filename!}``. This
 statement will be replaced by the contents of ``filename``. Markdown-Include
-will work recursively, so any included files within ``filename`` wil also be
+will work recursively, so any included files within ``filename`` will also be
 included. This replacement is done prior to any other
 Markdown processing, so any Markdown syntax that you want can be used within
 your included files. Note that this is a change from the previous version.
@@ -34,3 +34,10 @@ Markdown is being called. If you would like to change the directory relative to
 which paths are evaluated, then this can be done by specifying the extension
 setting ``base_dir``. 
 
+##ChangeLog
+###Version 0.3
+Added support for Python 3.
+###Version 0.2
+Changed the API to be less likely to conflict with other syntax.
+###Version 0.1
+Initial release.

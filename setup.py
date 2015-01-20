@@ -11,13 +11,13 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
   name = 'markdown-include',
   packages = find_packages(),
-  version = '0.1',
+  version = '0.3',
   description = 'This is an extension to Python-Markdown which provides an "include" function, similar to that found in LaTeX (and also the C pre-processor and Fortran). I originally wrote it for my FORD Fortran auto-documentation generator.',
   long_description = long_description,
   author = 'Chris MacMackin',
   author_email = 'cmacmackin@gmail.com',
   url = 'https://github.com/cmacmackin/markdown-include/', 
-  download_url = 'https://github.com/cmacmackin/markdown-include/tarball/v0.1',
+  download_url = 'https://github.com/cmacmackin/markdown-include/tarball/v0.2',
   keywords = ['Markdown', 'typesetting', 'include', 'plugin', 'extension'],
   classifiers=[
         # How mature is this project? Common values are
@@ -41,6 +41,9 @@ setup(
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
     ],
   install_requires = ['markdown']
 )

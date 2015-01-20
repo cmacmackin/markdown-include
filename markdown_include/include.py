@@ -24,6 +24,7 @@
 
 
 
+from __future__ import print_function
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 import re
@@ -73,7 +74,7 @@ class IncludePreprocessor(Preprocessor):
                         with open(filename, 'r') as r:
                             text = r.readlines()
                     except:
-                        print 'Warning: could not find file {}. Ignoring include statement.'.format(filename)
+                        print('Warning: could not find file {}. Ignoring include statement.'.format(filename))
                         lines[loc] = INC_SYNTAX.sub('',line)
                         
                         break

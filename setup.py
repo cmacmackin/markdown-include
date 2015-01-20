@@ -17,7 +17,7 @@ setup(
   author = 'Chris MacMackin',
   author_email = 'cmacmackin@gmail.com',
   url = 'https://github.com/cmacmackin/markdown-include/', 
-  download_url = 'https://github.com/cmacmackin/markdown-include/tarball/v0.2',
+  download_url = 'https://github.com/cmacmackin/markdown-include/tarball/v0.3',
   keywords = ['Markdown', 'typesetting', 'include', 'plugin', 'extension'],
   classifiers=[
         # How mature is this project? Common values are

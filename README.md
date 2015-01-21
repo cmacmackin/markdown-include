@@ -35,6 +35,8 @@ which paths are evaluated, then this can be done by specifying the extension
 setting ``base_dir``. 
 
 ##ChangeLog
+###Version 0.4
+Fixed problem related to passing configurations to the extension.
 ###Version 0.3
 Added support for Python 3.
 ###Version 0.2

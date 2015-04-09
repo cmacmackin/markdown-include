@@ -32,7 +32,19 @@ fragments present in the Markdown.
 By default, all file-names are evaluated relative to the location from which
 Markdown is being called. If you would like to change the directory relative to
 which paths are evaluated, then this can be done by specifying the extension
-setting ``base_dir``. 
+setting ``base_path``.
+
+
+```python
+import markdown
+from markdown_include.include import MarkdownInclude
+
+# Markdown Extensions
+markdown_include = MarkdownInclude(
+    configs={'base_path':'/srv/content/', 'encoding': 'iso-8859-1'}
+)
+html = markdown.markdown(source, extensions=[markdown_include])
+```
 
 ##ChangeLog
 ###Version 0.4

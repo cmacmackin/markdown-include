@@ -52,7 +52,7 @@ class MarkdownInclude(Extension):
 class IncludePreprocessor(Preprocessor):
     '''
     This provides an "include" function for Markdown, similar to that found in
-    LaTeX (also the C pre-processor and Fortran). The syntax is {{filename}},
+    LaTeX (also the C pre-processor and Fortran). The syntax is {!filename!},
     which will be replaced by the contents of filename. Any such statements in
     filename will also be replaced. This replacement is done prior to any other
     Markdown processing. All file-names are evaluated relative to the location

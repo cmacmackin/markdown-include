@@ -1,4 +1,3 @@
-*.rst
 *~
 markdown_include.egg-info/
 dist/

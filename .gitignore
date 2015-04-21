@@ -2,3 +2,5 @@
 markdown_include.egg-info/
 dist/
 *.pyc
+test.py
+test.md

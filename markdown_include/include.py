@@ -33,7 +33,7 @@ INC_SYNTAX = re.compile(r'\{!\s*(.+?)\s*!\}')
 
 
 class MarkdownInclude(Extension):
-    def __init__(self, configs=[]):
+    def __init__(self, configs={}):
         self.config = {
             'base_path': ['.', 'Default location from which to evaluate ' \
                 'relative paths for the include statement.'],

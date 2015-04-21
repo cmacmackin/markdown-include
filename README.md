@@ -47,6 +47,10 @@ html = markdown.markdown(source, extensions=[markdown_include])
 ```
 
 ##ChangeLog
+###Version 0.5
+Corrected some errors in documentation and merged in commits of
+[diegobz](https://github.com/diegobz) to add support for encoding and tidy up
+the source code.
 ###Version 0.4
 Fixed problem related to passing configurations to the extension.
 ###Version 0.3

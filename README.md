@@ -47,6 +47,8 @@ html = markdown.markdown(source, extensions=[markdown_include])
 ```
 
 ##ChangeLog
+###Version 0.5.1
+Bugfix for a syntax error.
 ###Version 0.5
 Corrected some errors in documentation and merged in commits of
 [diegobz](https://github.com/diegobz) to add support for encoding and tidy up

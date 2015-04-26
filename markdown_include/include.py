@@ -80,7 +80,7 @@ class IncludePreprocessor(Preprocessor):
                     try:
                         with open(filename, 'r', encoding=self.encoding) as r:
                             text = r.readlines()
-                    except Exception, e:
+                    except Exception as e:
                         print('Warning: could not find file {}. Ignoring '
                             'include statement. Error: {}'.format(filename, e))
                         lines[loc] = INC_SYNTAX.sub('',line)

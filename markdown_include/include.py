@@ -86,10 +86,11 @@ class IncludePreprocessor(Preprocessor):
                         lines[loc] = INC_SYNTAX.sub('',line)
                         break
 
-                    line_split = INC_SYNTAX.split(line,maxsplit=0)
-                    if len(text) == 0: text.append('')
+                    line_split = INC_SYNTAX.split(line)
+                    if len(text) == 0:
+                        text.append('')
                     for i in range(len(text)):
-                        text[i] = text[i][0:-1]
+                        text[i] = text[i].rstrip('\r\n')
                     text[0] = line_split[0] + text[0]
                     text[-1] = text[-1] + line_split[2]
                     lines = lines[:loc] + text + lines[loc+1:]

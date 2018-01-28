@@ -1,4 +1,4 @@
-#Markdown-Include
+# Markdown-Include
 
 This is an extension to [Python-Markdown](https://pythonhosted.org/Markdown/)
 which provides an "include" function, similar to that found in
@@ -6,13 +6,13 @@ LaTeX (and also the C pre-processor and Fortran). I originally wrote it for my
 [FORD](https://github.com/cmacmackin/ford) Fortran auto-documentation generator.
 
 
-##Installation
+## Installation
 This module can now be installed using ``pip``.
 
     pip install markdown-include
 
 
-##Usage
+## Usage
 This module can be used in a program in the following way:
 
 ```python
@@ -46,18 +46,18 @@ markdown_include = MarkdownInclude(
 html = markdown.markdown(source, extensions=[markdown_include])
 ```
 
-##ChangeLog
-###Version 0.5.1
+## ChangeLog
+### Version 0.5.1
 Bugfix for a syntax error.
-###Version 0.5
+### Version 0.5
 Corrected some errors in documentation and merged in commits of
 [diegobz](https://github.com/diegobz) to add support for encoding and tidy up
 the source code.
-###Version 0.4
+### Version 0.4
 Fixed problem related to passing configurations to the extension.
-###Version 0.3
+### Version 0.3
 Added support for Python 3.
-###Version 0.2
+### Version 0.2
 Changed the API to be less likely to conflict with other syntax.
-###Version 0.1
+### Version 0.1
 Initial release.

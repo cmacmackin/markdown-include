@@ -30,6 +30,7 @@ from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 
 INC_SYNTAX = re.compile(r'\{!\s*(.+?)\s*!\}')
+HEADER_SYNTAX = re.compile( '^#+' )
 
 
 class MarkdownInclude(Extension):
@@ -38,7 +39,9 @@ class MarkdownInclude(Extension):
             'base_path': ['.', 'Default location from which to evaluate ' \
                 'relative paths for the include statement.'],
             'encoding': ['utf-8', 'Encoding of the files used by the include ' \
-                'statement.']
+                'statement.'],
+            'inheritHeaderDepth': [False, 'Increases headers on included file by amount of previous header'],
+            'metaPlugin': [False, 'If the meta plugin is used, strip out tags']
         }
         for key, value in configs.items():
             self.setConfig(key, value)
@@ -62,9 +65,12 @@ class IncludePreprocessor(Preprocessor):
         super(IncludePreprocessor, self).__init__(md)
         self.base_path = config['base_path']
         self.encoding = config['encoding']
+        self.inheritHeaderDepth = config['inheritHeaderDepth']
+        self.metaPlugin = config['metaPlugin']
 
     def run(self, lines):
         done = False
+        bonusHeader = ''
         while not done:
             for line in lines:
                 loc = lines.index(line)
@@ -80,6 +86,12 @@ class IncludePreprocessor(Preprocessor):
                     try:
                         with open(filename, 'r', encoding=self.encoding) as r:
                             text = r.readlines()
+                            if self.metaPlugin:
+                                for i, import_line in enumerate(text):
+                                    if not import_line.strip():
+                                        text = text[i + 1:]
+                                        break
+                            
                     except Exception as e:
                         print('Warning: could not find file {}. Ignoring '
                             'include statement. Error: {}'.format(filename, e))
@@ -90,11 +102,24 @@ class IncludePreprocessor(Preprocessor):
                     if len(text) == 0:
                         text.append('')
                     for i in range(len(text)):
-                        text[i] = text[i].rstrip('\r\n')
+                        # Strip the newline, and optionally increase header depth
+                        if self.inheritHeaderDepth:
+                            if HEADER_SYNTAX.search(text[i]):
+                                text[i] = bonusHeader + text[i][0:-1]
+                        else:
+                            text[i] = text[i][0:-1]
+                            
                     text[0] = line_split[0] + text[0]
                     text[-1] = text[-1] + line_split[2]
                     lines = lines[:loc] + text + lines[loc+1:]
                     break
+                    
+                else:
+                    h = HEADER_SYNTAX.search(line)
+                    if h:
+                        headerDepth = len(h.group(0))
+                        bonusHeader = '#' * headerDepth
+                
             else:
                 done = True
         return lines

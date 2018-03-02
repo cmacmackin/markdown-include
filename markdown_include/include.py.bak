@@ -86,12 +86,6 @@ class IncludePreprocessor(Preprocessor):
                     try:
                         with open(filename, 'r', encoding=self.encoding) as r:
                             text = r.readlines()
-                            if self.metaPlugin:
-                                for i, import_line in enumerate(text):
-                                    if not import_line.strip():
-                                        text = text[i + 1:]
-                                        break
-                            
                     except Exception as e:
                         print('Warning: could not find file {}. Ignoring '
                             'include statement. Error: {}'.format(filename, e))

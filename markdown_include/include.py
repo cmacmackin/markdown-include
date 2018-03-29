@@ -30,7 +30,7 @@ from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 
 INC_SYNTAX = re.compile(r'\{!\s*(.+?)\s*!\}')
-HEADER_SYNTAX = re.compile( '^#+' )
+HEADING_SYNTAX = re.compile( '^#+' )
 
 
 class MarkdownInclude(Extension):
@@ -40,7 +40,7 @@ class MarkdownInclude(Extension):
                 'relative paths for the include statement.'],
             'encoding': ['utf-8', 'Encoding of the files used by the include ' \
                 'statement.'],
-            'inheritHeaderDepth': [False, 'Increases headers on included file by amount of previous header'],
+            'inheritHeadingDepth': [False, 'Increases headings on included file by amount of previous heading'],
             'metaPlugin': [False, 'If the meta plugin is used, strip out tags']
         }
         for key, value in configs.items():
@@ -65,12 +65,12 @@ class IncludePreprocessor(Preprocessor):
         super(IncludePreprocessor, self).__init__(md)
         self.base_path = config['base_path']
         self.encoding = config['encoding']
-        self.inheritHeaderDepth = config['inheritHeaderDepth']
+        self.inheritHeadingDepth = config['inheritHeadingDepth']
         self.metaPlugin = config['metaPlugin']
 
     def run(self, lines):
         done = False
-        bonusHeader = ''
+        bonusHeading = ''
         while not done:
             for line in lines:
                 loc = lines.index(line)
@@ -103,9 +103,9 @@ class IncludePreprocessor(Preprocessor):
                         text.append('')
                     for i in range(len(text)):
                         # Strip the newline, and optionally increase header depth
-                        if self.inheritHeaderDepth:
-                            if HEADER_SYNTAX.search(text[i]):
-                                text[i] = bonusHeader + text[i][0:-1]
+                        if self.inheritHeadingDepth:
+                            if HEADING_SYNTAX.search(text[i]):
+                                text[i] = bonusHeading + text[i][0:-1]
                         else:
                             text[i] = text[i][0:-1]
                             
@@ -115,10 +115,10 @@ class IncludePreprocessor(Preprocessor):
                     break
                     
                 else:
-                    h = HEADER_SYNTAX.search(line)
+                    h = HEADING_SYNTAX.search(line)
                     if h:
-                        headerDepth = len(h.group(0))
-                        bonusHeader = '#' * headerDepth
+                        headingDepth = len(h.group(0))
+                        bonusHeading = '#' * headingDepth
                 
             else:
                 done = True

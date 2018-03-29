@@ -46,6 +46,59 @@ markdown_include = MarkdownInclude(
 html = markdown.markdown(source, extensions=[markdown_include])
 ```
 
+
+Included files can inherit the heading depth of the location
+``inheritHeadingDepth``, as well as receive a specific offset, ``headingOffset``
+
+For example, given these two files:
+
+```markdown
+Source file
+# Heading Level 1 of main file
+
+{!included_file.md!}
+
+## Heading Level 2 of main file
+
+{!included_file.md!}
+```
+
+And included_file.md,
+
+```markdown
+# This heading will be one level deeper from the previous heading
+More included file content.
+End of included content.
+```
+
+When ran through,
+
+```python
+import markdown
+from markdown_include.include import MarkdownInclude
+
+# Markdown Extensions
+markdown_include = MarkdownInclude(
+    configs={'inheritHeadingDepth':True}
+)
+html = markdown.markdown(source, extensions=[markdown_include])
+```
+
+Will produce:
+
+```html
+<p>Source file</p>
+<h1>Heading Level 1 of main file</h1>
+<h2>This heading will be one level deeper from the previous heading</h2>
+<p>More included file content.</p>
+<p>End of included content.</p>
+<h2>Heading Level 2 of main file</h2>
+<h3>This heading will be one level deeper from the previous heading</h3>
+<p>More included file content.</p>
+<p>End of included content.</p>
+```
+
+
 ## ChangeLog
 ### Version 0.5.1
 Bugfix for a syntax error.

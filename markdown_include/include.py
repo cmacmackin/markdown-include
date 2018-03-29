@@ -40,7 +40,11 @@ class MarkdownInclude(Extension):
                 'relative paths for the include statement.'],
             'encoding': ['utf-8', 'Encoding of the files used by the include ' \
                 'statement.'],
-            'inheritHeadingDepth': [False, 'Increases headings on included file by amount of previous heading'],
+            'inheritHeadingDepth': [False, 'Increases headings on included ' \
+                'file by amount of previous heading (combines with '\
+                'headingOffset option).'],
+            'headingOffset': [0, 'Increases heading depth by a specific ' \
+                'amount (and the inheritHeadingDepth option).  Defaults to 0.'],
             'metaPlugin': [False, 'If the meta plugin is used, strip out tags']
         }
         for key, value in configs.items():
@@ -67,6 +71,7 @@ class IncludePreprocessor(Preprocessor):
         self.encoding = config['encoding']
         self.inheritHeadingDepth = config['inheritHeadingDepth']
         self.metaPlugin = config['metaPlugin']
+        self.headingOffset = config['headingOffset']
 
     def run(self, lines):
         done = False
@@ -103,9 +108,13 @@ class IncludePreprocessor(Preprocessor):
                         text.append('')
                     for i in range(len(text)):
                         # Strip the newline, and optionally increase header depth
-                        if self.inheritHeadingDepth:
+                        if self.inheritHeadingDepth or self.headingOffset:
                             if HEADING_SYNTAX.search(text[i]):
-                                text[i] = bonusHeading + text[i][0:-1]
+                                text[i] = text[i][0:-1]
+                                if self.inheritHeadingDepth:
+                                    text[i] = bonusHeading + text[i]
+                                if self.headingOffset:
+                                    text[i] = '#' * self.headingOffset + text[i]
                         else:
                             text[i] = text[i][0:-1]
                             

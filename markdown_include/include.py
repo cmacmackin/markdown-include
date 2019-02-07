@@ -30,6 +30,7 @@ from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 
 INC_SYNTAX = re.compile(r'\{!\s*(.+?)\s*!\}')
+HEADING_SYNTAX = re.compile( '^#+' )
 
 
 class MarkdownInclude(Extension):
@@ -38,7 +39,12 @@ class MarkdownInclude(Extension):
             'base_path': ['.', 'Default location from which to evaluate ' \
                 'relative paths for the include statement.'],
             'encoding': ['utf-8', 'Encoding of the files used by the include ' \
-                'statement.']
+                'statement.'],
+            'inheritHeadingDepth': [False, 'Increases headings on included ' \
+                'file by amount of previous heading (combines with '\
+                'headingOffset option).'],
+            'headingOffset': [0, 'Increases heading depth by a specific ' \
+                'amount (and the inheritHeadingDepth option).  Defaults to 0.'],
         }
         for key, value in configs.items():
             self.setConfig(key, value)
@@ -62,9 +68,12 @@ class IncludePreprocessor(Preprocessor):
         super(IncludePreprocessor, self).__init__(md)
         self.base_path = config['base_path']
         self.encoding = config['encoding']
+        self.inheritHeadingDepth = config['inheritHeadingDepth']
+        self.headingOffset = config['headingOffset']
 
     def run(self, lines):
         done = False
+        bonusHeading = ''
         while not done:
             for line in lines:
                 loc = lines.index(line)
@@ -80,6 +89,7 @@ class IncludePreprocessor(Preprocessor):
                     try:
                         with open(filename, 'r', encoding=self.encoding) as r:
                             text = r.readlines()
+                            
                     except Exception as e:
                         print('Warning: could not find file {}. Ignoring '
                             'include statement. Error: {}'.format(filename, e))
@@ -90,11 +100,28 @@ class IncludePreprocessor(Preprocessor):
                     if len(text) == 0:
                         text.append('')
                     for i in range(len(text)):
-                        text[i] = text[i].rstrip('\r\n')
+                        # Strip the newline, and optionally increase header depth
+                        if self.inheritHeadingDepth or self.headingOffset:
+                            if HEADING_SYNTAX.search(text[i]):
+                                text[i] = text[i][0:-1]
+                                if self.inheritHeadingDepth:
+                                    text[i] = bonusHeading + text[i]
+                                if self.headingOffset:
+                                    text[i] = '#' * self.headingOffset + text[i]
+                        else:
+                            text[i] = text[i][0:-1]
+                            
                     text[0] = line_split[0] + text[0]
                     text[-1] = text[-1] + line_split[2]
                     lines = lines[:loc] + text + lines[loc+1:]
                     break
+                    
+                else:
+                    h = HEADING_SYNTAX.search(line)
+                    if h:
+                        headingDepth = len(h.group(0))
+                        bonusHeading = '#' * headingDepth
+                
             else:
                 done = True
         return lines

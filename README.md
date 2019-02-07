@@ -34,7 +34,22 @@ Markdown is being called. If you would like to change the directory relative to
 which paths are evaluated, then this can be done by specifying the extension
 setting ``base_path``.
 
+## Configuration
 
+The following settings can be specified when initialising the plugin.
+
+- __base_path__: Default location from which to evaluate relative
+  paths for the include statement. (Default: the run-directory.)
+- __encoding__: Encoding of the files used by the include statement. (Default: utf-8.)
+- __inheritHeadingDepth__ : If true, increases headings on include
+  file by amount of previous heading. Combiens with headingOffset
+  option, below. (Default: False.)
+- __headingOffset__: Increases heading depth by a specific ammount, in
+  addition to the inheritHeadingDepth Option. (Default: 0)
+
+##Examples
+
+An example of setting the base path and file encoding is given below:
 ```python
 import markdown
 from markdown_include.include import MarkdownInclude
@@ -45,6 +60,52 @@ markdown_include = MarkdownInclude(
 )
 html = markdown.markdown(source, extensions=[markdown_include])
 ```
+
+Included files can inherit the heading depth of the location
+``inheritHeadingDepth``, as well as receive a specific offset, ``headingOffset``
+For example, consider the  files
+```markdown
+Source file
+# Heading Level 1 of main file
+
+{!included_file.md!}
+
+## Heading Level 2 of main file
+
+{!included_file.md!}
+```
+
+and included_file.md
+
+```markdown
+# This heading will be one level deeper from the previous heading
+More included file content.
+End of included content.
+```
+Then running the script
+```python
+import markdown
+from markdown_include.include import MarkdownInclude
+
+# Markdown Extensions
+markdown_include = MarkdownInclude(
+    configs={'inheritHeadingDepth':True}
+)
+html = markdown.markdown(source, extensions=[markdown_include])
+```
+produces
+```html
+<p>Source file</p>
+<h1>Heading Level 1 of main file</h1>
+<h2>This heading will be one level deeper from the previous heading</h2>
+<p>More included file content.</p>
+<p>End of included content.</p>
+<h2>Heading Level 2 of main file</h2>
+<h3>This heading will be one level deeper from the previous heading</h3>
+<p>More included file content.</p>
+<p>End of included content.</p>
+```
+
 
 ## ChangeLog
 ### Version 0.5.1

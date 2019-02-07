@@ -45,7 +45,6 @@ class MarkdownInclude(Extension):
                 'headingOffset option).'],
             'headingOffset': [0, 'Increases heading depth by a specific ' \
                 'amount (and the inheritHeadingDepth option).  Defaults to 0.'],
-            'metaPlugin': [False, 'If the meta plugin is used, strip out tags']
         }
         for key, value in configs.items():
             self.setConfig(key, value)
@@ -70,7 +69,6 @@ class IncludePreprocessor(Preprocessor):
         self.base_path = config['base_path']
         self.encoding = config['encoding']
         self.inheritHeadingDepth = config['inheritHeadingDepth']
-        self.metaPlugin = config['metaPlugin']
         self.headingOffset = config['headingOffset']
 
     def run(self, lines):
@@ -91,11 +89,6 @@ class IncludePreprocessor(Preprocessor):
                     try:
                         with open(filename, 'r', encoding=self.encoding) as r:
                             text = r.readlines()
-                            if self.metaPlugin:
-                                for i, import_line in enumerate(text):
-                                    if not import_line.strip():
-                                        text = text[i + 1:]
-                                        break
                             
                     except Exception as e:
                         print('Warning: could not find file {}. Ignoring '

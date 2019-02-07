@@ -45,6 +45,11 @@ class MarkdownInclude(Extension):
                 'headingOffset option).'],
             'headingOffset': [0, 'Increases heading depth by a specific ' \
                 'amount (and the inheritHeadingDepth option).  Defaults to 0.'],
+            'throwException': [False, 'When true, if the extension is unable '\
+                                'to find an included file it will throw an '\
+                                'exception which the user can catch. If false '\
+                                '(default), a warning will be printed and '\
+                                'Markdown will continue parsing the file.']
         }
         for key, value in configs.items():
             self.setConfig(key, value)
@@ -70,13 +75,13 @@ class IncludePreprocessor(Preprocessor):
         self.encoding = config['encoding']
         self.inheritHeadingDepth = config['inheritHeadingDepth']
         self.headingOffset = config['headingOffset']
+        self.throwException = config['throwException']
 
     def run(self, lines):
         done = False
         bonusHeading = ''
         while not done:
-            for line in lines:
-                loc = lines.index(line)
+            for loc, line in enumerate(lines):
                 m = INC_SYNTAX.search(line)
 
                 if m:
@@ -91,10 +96,13 @@ class IncludePreprocessor(Preprocessor):
                             text = r.readlines()
                             
                     except Exception as e:
-                        print('Warning: could not find file {}. Ignoring '
-                            'include statement. Error: {}'.format(filename, e))
-                        lines[loc] = INC_SYNTAX.sub('',line)
-                        break
+                        if not self.throwException:
+                            print('Warning: could not find file {}. Ignoring '
+                                  'include statement. Error: {}'.format(filename, e))
+                            lines[loc] = INC_SYNTAX.sub('',line)
+                            break
+                        else:
+                            raise e
 
                     line_split = INC_SYNTAX.split(line)
                     if len(text) == 0:

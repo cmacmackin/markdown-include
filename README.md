@@ -46,6 +46,10 @@ The following settings can be specified when initialising the plugin.
   option, below. (Default: False.)
 - __headingOffset__: Increases heading depth by a specific ammount, in
   addition to the inheritHeadingDepth Option. (Default: 0)
+- __throwException__: When true, if the extension is unable to find an
+  included file it will throw an exception which the user can
+  catch. If false (default), a warning will be printed and Markdown
+  will continue parsing the file.
 
 ##Examples
 

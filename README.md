@@ -51,7 +51,7 @@ The following settings can be specified when initialising the plugin.
   catch. If false (default), a warning will be printed and Markdown
   will continue parsing the file.
 
-##Examples
+## Examples
 
 An example of setting the base path and file encoding is given below:
 ```python

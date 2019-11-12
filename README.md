@@ -34,6 +34,10 @@ Markdown is being called. If you would like to change the directory relative to
 which paths are evaluated, then this can be done by specifying the extension
 setting ``base_path``.
 
+You can pass in paramaters to the included Markdown, using the notation
+``{!filename --key="Value"!}``. In the target file, the parameter should be
+using the format ``{{key}}``, and it would be replaced by ``value``.
+
 ## Configuration
 
 The following settings can be specified when initialising the plugin.
@@ -42,16 +46,19 @@ The following settings can be specified when initialising the plugin.
   paths for the include statement. (Default: the run-directory.)
 - __encoding__: Encoding of the files used by the include statement. (Default: utf-8.)
 - __inheritHeadingDepth__ : If true, increases headings on include
-  file by amount of previous heading. Combiens with headingOffset
+  file by amount of previous heading. Combines with headingOffset
   option, below. (Default: False.)
-- __headingOffset__: Increases heading depth by a specific ammount, in
+- __headingOffset__: Increases heading depth by a specific amount, in
   addition to the inheritHeadingDepth Option. (Default: 0)
 - __throwException__: When true, if the extension is unable to find an
   included file it will throw an exception which the user can
   catch. If false (default), a warning will be printed and Markdown
   will continue parsing the file.
+- __trimNewlines__: Remove redundant newlines from files with specified
+  extension. Value is a comma delimited list of extensions.
+  Defaults to none.
 
-##Examples
+## Examples
 
 An example of setting the base path and file encoding is given below:
 ```python
@@ -110,8 +117,29 @@ produces
 <p>End of included content.</p>
 ```
 
+```markdown
+Source file
+# Heading Level 1 of main file
+
+{!included_file.md --name="John Smith"!}
+```
+
+and included_file.md
+
+```markdown
+Hello {{name}}
+```
+
+produces
+```html
+Hello John Smith
+```
 
 ## ChangeLog
+### Version 0.5.3
+Remove new lines for specific extensions
+### Version 0.5.2
+Added basic support for parameters
 ### Version 0.5.1
 Bugfix for a syntax error.
 ### Version 0.5

@@ -49,7 +49,10 @@ class MarkdownInclude(Extension):
                                 'to find an included file it will throw an '\
                                 'exception which the user can catch. If false '\
                                 '(default), a warning will be printed and '\
-                                'Markdown will continue parsing the file.']
+                                'Markdown will continue parsing the file.'],
+            'trimNewlines': ['', 'Remove redundant newlines from files with '\
+                                'specified extension. Value is a comma delimited '\
+                                'list of extensions. Defaults to none.']
         }
         for key, value in configs.items():
             self.setConfig(key, value)
@@ -76,6 +79,7 @@ class IncludePreprocessor(Preprocessor):
         self.inheritHeadingDepth = config['inheritHeadingDepth']
         self.headingOffset = config['headingOffset']
         self.throwException = config['throwException']
+        self.trimNewlines = config['trimNewlines']
 
     def run(self, lines):
         done = False
@@ -85,7 +89,9 @@ class IncludePreprocessor(Preprocessor):
                 m = INC_SYNTAX.search(line)
 
                 if m:
-                    filename = m.group(1)
+                    includeArgs = m.group(1).split('--')
+                    filename = includeArgs.pop(0).strip()
+                    params = includeArgs
                     filename = os.path.expanduser(filename)
                     if not os.path.isabs(filename):
                         filename = os.path.normpath(
@@ -94,7 +100,7 @@ class IncludePreprocessor(Preprocessor):
                     try:
                         with open(filename, 'r', encoding=self.encoding) as r:
                             text = r.readlines()
-                            
+
                     except Exception as e:
                         if not self.throwException:
                             print('Warning: could not find file {}. Ignoring '
@@ -118,18 +124,28 @@ class IncludePreprocessor(Preprocessor):
                                     text[i] = '#' * self.headingOffset + text[i]
                         else:
                             text[i] = text[i][0:-1]
-                            
+
                     text[0] = line_split[0] + text[0]
                     text[-1] = text[-1] + line_split[2]
-                    lines = lines[:loc] + text + lines[loc+1:]
+                    lines = lines[:loc] + text + lines[loc + 1:]
+                    if len(params) > 0:
+                        # Process params
+                        for param in params:
+                            pName, pValue = param.strip().split('=')
+                            pValue = pValue.rstrip('\"').lstrip('\"')
+                            lines = [l.replace('{{' + pName + '}}', pValue) for l in lines]
+                    if self.trimNewlines != '':
+                        extension = os.path.splitext(filename)[1].lstrip('.')
+                        if extension in self.trimNewlines.split(','):
+                            lines = [l.rstrip('\n') for l in lines]
                     break
-                    
+
                 else:
                     h = HEADING_SYNTAX.search(line)
                     if h:
                         headingDepth = len(h.group(0))
                         bonusHeading = '#' * headingDepth
-                
+
             else:
                 done = True
         return lines

@@ -50,7 +50,10 @@ class MarkdownInclude(Extension):
                                 'to find an included file it will throw an '\
                                 'exception which the user can catch. If false '\
                                 '(default), a warning will be printed and '\
-                                'Markdown will continue parsing the file.']
+                                'Markdown will continue parsing the file.'],
+            'trimNewlines': ['', 'Remove redundant newlines from files with '\
+                                'specified extension. Value is a comma delimited '\
+                                'list of extensions. Defaults to none.']
         }
         for key, value in configs.items():
             self.setConfig(key, value)
@@ -77,6 +80,7 @@ class IncludePreprocessor(Preprocessor):
         self.inheritHeadingDepth = config['inheritHeadingDepth']
         self.headingOffset = config['headingOffset']
         self.throwException = config['throwException']
+        self.trimNewlines = config['trimNewlines']
 
     def run(self, lines):
         done = False
@@ -131,6 +135,10 @@ class IncludePreprocessor(Preprocessor):
                             pName, pValue = param.strip().split('=')
                             pValue = pValue.rstrip('\"').lstrip('\"')
                             lines = [l.replace('{{' + pName + '}}', pValue) for l in lines]
+                    if self.trimNewlines != '':
+                        extension = os.path.splitext(filename)[1].lstrip('.')
+                        if extension in self.trimNewlines.split(','):
+                            lines = [l.rstrip('\n') for l in lines]
                     break
 
                 else:

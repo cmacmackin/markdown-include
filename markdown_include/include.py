@@ -30,7 +30,6 @@ from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 
 INC_SYNTAX = re.compile(r'\{!\s*(.+?)\s*!\}')
-PARAM_SYNTAX = re.compile('--*\s')
 HEADING_SYNTAX = re.compile( '^#+' )
 
 

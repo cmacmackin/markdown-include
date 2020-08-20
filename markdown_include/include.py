@@ -55,9 +55,7 @@ class MarkdownInclude(Extension):
             self.setConfig(key, value)
 
     def extendMarkdown(self, md, md_globals):
-        md.preprocessors.add(
-            'include', IncludePreprocessor(md,self.getConfigs()),'_begin'
-        )
+        md.preprocessors.register(IncludePreprocessor(md,self.getConfigs()), 'include', 101)
 
 
 class IncludePreprocessor(Preprocessor):

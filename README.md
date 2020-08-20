@@ -112,6 +112,11 @@ produces
 
 
 ## ChangeLog
+### Version 0.6.0
+- Added ability ot offset headers in the included file so they fall under the header level in which the include occurs
+- Add option to throw exception when can't find an include file (instead of printing a warning)
+- Fixed stripping of last character in file, so only occurs if it is a new-line
+- Some behind-the-scenes improvement to code and documentation
 ### Version 0.5.1
 Bugfix for a syntax error.
 ### Version 0.5

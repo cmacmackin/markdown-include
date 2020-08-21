@@ -27,6 +27,14 @@ This module can be used in a program in the following way:
     import markdown
     html = markdown.markdown(source, extensions=[markdown_include.include'])
 
+Markdown-Include can also be included in MkDocs projects like below:
+
+::
+
+    markdown_extensions:
+        - markdown_include.include:
+            base_path: docs
+
 The syntax for use within your Markdown files is ``{!filename!}``. This
 statement will be replaced by the contents of ``filename``.
 Markdown-Include will work recursively, so any included files within

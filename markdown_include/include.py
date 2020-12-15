@@ -91,7 +91,7 @@ class IncludePreprocessor(Preprocessor):
                         )
                     try:
                         with open(filename, 'r', encoding=self.encoding) as r:
-                            text = r.readlines()
+                            text = self.run(r.readlines())
                             
                     except Exception as e:
                         if not self.throwException:

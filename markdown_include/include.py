@@ -121,7 +121,7 @@ class IncludePreprocessor(Preprocessor):
                             text[i] = text[i].rstrip('\r\n')
                             
                     text[0] = line_split[0] + text[0]
-                    text[-1] = text[-1] + line_split[2]
+                    text[-1] = text[-1] + line_split[-1]
                     lines = lines[:loc] + text + lines[loc+1:]
                     break
                     

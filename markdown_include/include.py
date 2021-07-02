@@ -29,7 +29,7 @@ from codecs import open
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 
-INC_SYNTAX = re.compile(r'(\w+)\{!\s*(.+?)\s*!\}')
+INC_SYNTAX = re.compile(r'(\s*)\{!\s*(.+?)\s*!\}')
 HEADING_SYNTAX = re.compile( '^#+' )
 
 

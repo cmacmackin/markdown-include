@@ -17,7 +17,7 @@ setup(
   author = 'Chris MacMackin',
   author_email = 'cmacmackin@gmail.com',
   url = 'https://github.com/cmacmackin/markdown-include/', 
-  download_url = 'https://github.com/cmacmackin/markdown-include/tarball/v0.6.0',
+  download_url = 'https://github.com/cmacmackin/markdown-include/tarball/v0.7.0',
   keywords = ['Markdown', 'typesetting', 'include', 'plugin', 'extension'],
   classifiers=[
         # How mature is this project? Common values are
@@ -45,5 +45,5 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
     ],
-  install_requires = ['markdown']
+  install_requires = ['markdown>=3.0']
 )

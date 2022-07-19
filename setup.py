@@ -11,7 +11,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
   name = 'markdown-include',
   packages = find_packages(),
-  version = '0.6.0',
+  version = '0.7.0',
   description = 'This is an extension to Python-Markdown which provides an "include" function, similar to that found in LaTeX (and also the C pre-processor and Fortran). I originally wrote it for my FORD Fortran auto-documentation generator.',
   long_description = long_description,
   author = 'Chris MacMackin',

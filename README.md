@@ -112,6 +112,9 @@ produces
 
 
 ## ChangeLog
+### Version 0.7.0
+Modified to work with Python-Markdown 3.4. This makes the plugin
+incompatible with versions < 3.0.
 ### Version 0.6.0
 - Added ability ot offset headers in the included file so they fall under the header level in which the include occurs
 - Add option to throw exception when can't find an include file (instead of printing a warning)

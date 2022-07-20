@@ -34,6 +34,10 @@ Markdown is being called. If you would like to change the directory relative to
 which paths are evaluated, then this can be done by specifying the extension
 setting ``base_path``.
 
+If there are leading tabs and spaces before the include statement, 
+all the lines of the included file get prepended the same number of tabs, 
+so includes to indented sections get automatically indented.
+
 ## Configuration
 
 The following settings can be specified when initialising the plugin.

@@ -29,7 +29,7 @@ from codecs import open
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 
-INC_SYNTAX = re.compile(r'\{!\s*(.+?)\s*!\}')
+INC_SYNTAX = re.compile(r'([ \t]*)\{!\s*(.+?)\s*!\}')
 HEADING_SYNTAX = re.compile( '^#+' )
 
 
@@ -83,7 +83,8 @@ class IncludePreprocessor(Preprocessor):
                 m = INC_SYNTAX.search(line)
 
                 if m:
-                    filename = m.group(1)
+                    tabs = m.group(1)
+                    filename = m.group(2)
                     filename = os.path.expanduser(filename)
                     if not os.path.isabs(filename):
                         filename = os.path.normpath(
@@ -92,6 +93,8 @@ class IncludePreprocessor(Preprocessor):
                     try:
                         with open(filename, 'r', encoding=self.encoding) as r:
                             text = r.readlines()
+                            if len(tabs):
+                                text = [tabs+line for line in text]
                             
                     except Exception as e:
                         if not self.throwException:
@@ -118,7 +121,7 @@ class IncludePreprocessor(Preprocessor):
                             text[i] = text[i].rstrip('\r\n')
                             
                     text[0] = line_split[0] + text[0]
-                    text[-1] = text[-1] + line_split[2]
+                    text[-1] = text[-1] + line_split[-1]
                     lines = lines[:loc] + text + lines[loc+1:]
                     break
                     

@@ -38,6 +38,7 @@ class MarkdownInclude(Extension):
         self.config = {
             'base_path': ['.', 'Default location from which to evaluate ' \
                 'relative paths for the include statement.'],
+            'extensions': [{}, 'Sets the allowed extensions to syntax highlight'],
             'encoding': ['utf-8', 'Encoding of the files used by the include ' \
                 'statement.'],
             'inheritHeadingDepth': [False, 'Increases headings on included ' \
@@ -70,10 +71,14 @@ class IncludePreprocessor(Preprocessor):
     def __init__(self, md, config):
         super(IncludePreprocessor, self).__init__(md)
         self.base_path = config['base_path']
+        self.extensions = config['extensions']
         self.encoding = config['encoding']
         self.inheritHeadingDepth = config['inheritHeadingDepth']
         self.headingOffset = config['headingOffset']
         self.throwException = config['throwException']
+        if not isinstance(self.extensions, dict):
+            print("The given 'extensions' config is not a dictionary. Inserting source code files is disabled.")
+            self.extensions = dict()
 
     def run(self, lines):
         done = False
@@ -119,6 +124,10 @@ class IncludePreprocessor(Preprocessor):
                             
                     text[0] = line_split[0] + text[0]
                     text[-1] = text[-1] + line_split[2]
+                    # if source code is included
+                    source_ext = os.path.splitext(filename)[1][1:]
+                    if source_ext in self.extensions:
+                        text = ['\n```'+ self.extensions[source_ext] +'\n', *text, '\n```\n']
                     lines = lines[:loc] + text + lines[loc+1:]
                     break
                     

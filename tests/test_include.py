@@ -1,120 +1,144 @@
-import os
-from unittest import TestCase
-
-import markdown
-
 from markdown_include.include import IncludePreprocessor, MarkdownInclude
 
+import markdown
+import pathlib
+from textwrap import dedent
 
-class TestInclude(TestCase):
-    def setUp(self) -> None:
-        self.maxDiff = None
-        self.markdown_include = MarkdownInclude(
-            configs={'base_path': os.path.dirname(os.path.realpath(__file__))}
-        )
-
-    def test_single_include(self):
-        source = "{!resources/simple.md!}"
-        html = markdown.markdown(source, extensions=[self.markdown_include])
-
-        self.assertEqual(html, '<p>This is a simple template</p>')
-
-    def test_double_include(self):
-        source = "{!resources/simple.md!} and {!resources/simple_2.md!}"
-        html = markdown.markdown(source, extensions=[self.markdown_include])
-
-        self.assertEqual(html, '<p>This is a simple template and This is another simple template</p>')
-
-    def test_headers(self):
-        source = "Source file\n" \
-                 "# Heading Level 1 of main file\n" \
-                 "{!resources/header.md!}\n" \
-                 "## Heading Level 2 of main file\n" \
-                 "{!resources/header.md!}"
-
-        html = markdown.markdown(source, extensions=[self.markdown_include])
-
-        self.assertEqual(html, "<p>Source file</p>\n"
-                                "<h1>Heading Level 1 of main file</h1>\n"
-                                "<h1>This heading will be one level deeper from the previous heading</h1>\n"
-                                "<p>More included file content.\n"
-                                "End of included content.</p>\n"
-                                "<h2>Heading Level 2 of main file</h2>\n"
-                                "<h1>This heading will be one level deeper from the previous heading</h1>\n"
-                                "<p>More included file content.\n"
-                                "End of included content.</p>")
+import pytest
 
 
-class TestEmbedded(TestCase):
-    def setUp(self) -> None:
-        self.maxDiff = None
-        self.markdown_include = MarkdownInclude(
-            configs={'base_path': os.path.dirname(os.path.realpath(__file__))}
-        )
-
-    def test_embedded_template(self):
-        source = "{!resources/template_inside.md!}"
-        html = markdown.markdown(source, extensions=[self.markdown_include])
-
-        self.assertEqual(html, "<p>This is a simple template</p>\n<p>This is a template with a template.</p>")
+RESOURCE_DIR = pathlib.Path(__file__).parent.absolute()
 
 
-class TestIncludeInheritHeaderDepth(TestCase):
-    def setUp(self) -> None:
-        self.maxDiff = None
-        self.markdown_include = MarkdownInclude(
-            configs={'base_path': os.path.dirname(os.path.realpath(__file__)), 'inheritHeadingDepth': True}
-        )
-
-    def test_single_include(self):
-        source = "{!resources/simple.md!}"
-        html = markdown.markdown(source, extensions=[self.markdown_include])
-
-        self.assertEqual(html, '<p>This is a simple template</p>')
-
-    def test_double_include(self):
-        source = "{!resources/simple.md!} and {!resources/simple_2.md!}"
-        html = markdown.markdown(source, extensions=[self.markdown_include])
-
-        self.assertEqual(html, '<p>This is a simple template and This is another simple template</p>')
-
-    def test_headers(self):
-        source = "Source file\n" \
-                 "# Heading Level 1 of main file\n" \
-                 "{!resources/header.md!}\n" \
-                 "## Heading Level 2 of main file\n" \
-                 "{!resources/header.md!}"
-
-        html = markdown.markdown(source, extensions=[self.markdown_include])
-
-        self.assertEqual(html, "<p>Source file</p>\n"
-                                "<h1>Heading Level 1 of main file</h1>\n"
-                                "<h2>This heading will be one level deeper from the previous heading</h2>\n"
-                                "<p>More included file content.</p>\n"
-                                "<p>End of included content.</p>\n"
-                                "<h2>Heading Level 2 of main file</h2>\n"
-                                "<h3>This heading will be one level deeper from the previous heading</h3>\n"
-                                "<p>More included file content.</p>\n"
-                                "<p>End of included content.</p>")
+@pytest.fixture(scope="module")
+def markdown_include():
+    return MarkdownInclude(configs={"base_path": RESOURCE_DIR})
 
 
-class TestProcessor(TestCase):
-    def setUp(self) -> None:
-        self.maxDiff = None
-        self.processor = IncludePreprocessor(None, {
-            "base_path": os.path.dirname(os.path.realpath(__file__)),
+@pytest.fixture(scope="module")
+def markdown_include_inherit_heading_depth():
+    return MarkdownInclude(
+        configs={"base_path": RESOURCE_DIR, "inheritHeadingDepth": True}
+    )
+
+
+def test_single_include(markdown_include):
+    source = "{!resources/simple.md!}"
+    html = markdown.markdown(source, extensions=[markdown_include])
+
+    assert html == "<p>This is a simple template</p>"
+
+
+def test_double_include(markdown_include):
+    source = "{!resources/simple.md!} and {!resources/simple_2.md!}"
+    html = markdown.markdown(source, extensions=[markdown_include])
+
+    assert (
+        html == "<p>This is a simple template and This is another simple template</p>"
+    )
+
+
+def test_headers(markdown_include):
+    source = (
+        "Source file\n"
+        "# Heading Level 1 of main file\n"
+        "{!resources/header.md!}\n"
+        "## Heading Level 2 of main file\n"
+        "{!resources/header.md!}"
+    )
+
+    html = markdown.markdown(source, extensions=[markdown_include])
+
+    assert html == dedent(
+        """\
+        <p>Source file</p>
+        <h1>Heading Level 1 of main file</h1>
+        <h1>This heading will be one level deeper from the previous heading</h1>
+        <p>More included file content.
+        End of included content.</p>
+        <h2>Heading Level 2 of main file</h2>
+        <h1>This heading will be one level deeper from the previous heading</h1>
+        <p>More included file content.
+        End of included content.</p>"""
+    )
+
+
+def test_embedded_template(markdown_include):
+    source = "{!resources/template_inside.md!}"
+    html = markdown.markdown(source, extensions=[markdown_include])
+
+    assert (
+        html
+        == "<p>This is a simple template</p>\n<p>This is a template with a template.</p>"
+    )
+
+
+def test_single_include_inherit_heading_depth(markdown_include_inherit_heading_depth):
+    source = "{!resources/simple.md!}"
+    html = markdown.markdown(
+        source, extensions=[markdown_include_inherit_heading_depth]
+    )
+
+    assert html == "<p>This is a simple template</p>"
+
+
+def test_double_include_inherit_heading_depth(markdown_include_inherit_heading_depth):
+    source = "{!resources/simple.md!} and {!resources/simple_2.md!}"
+    html = markdown.markdown(
+        source, extensions=[markdown_include_inherit_heading_depth]
+    )
+
+    assert (
+        html == "<p>This is a simple template and This is another simple template</p>"
+    )
+
+
+def test_headers_inherit_heading_depth(markdown_include_inherit_heading_depth):
+    source = (
+        "Source file\n"
+        "# Heading Level 1 of main file\n"
+        "{!resources/header.md!}\n"
+        "## Heading Level 2 of main file\n"
+        "{!resources/header.md!}"
+    )
+
+    html = markdown.markdown(
+        source, extensions=[markdown_include_inherit_heading_depth]
+    )
+
+    assert html == dedent(
+        """\
+        <p>Source file</p>
+        <h1>Heading Level 1 of main file</h1>
+        <h2>This heading will be one level deeper from the previous heading</h2>
+        <p>More included file content.</p>
+        <p>End of included content.</p>
+        <h2>Heading Level 2 of main file</h2>
+        <h3>This heading will be one level deeper from the previous heading</h3>
+        <p>More included file content.</p>
+        <p>End of included content.</p>"""
+    )
+
+
+def test_processor_lines():
+    processor = IncludePreprocessor(
+        None,
+        {
+            "base_path": RESOURCE_DIR,
             "encoding": "utf-8",
             "inheritHeadingDepth": False,
             "headingOffset": 0,
             "throwException": False,
-        })
+        },
+    )
 
-    def test_lines(self):
-        source = ["Source file",
-                  "# Heading Level 1 of main file",
-                  "{!resources/header.md!}",
-                  "## Heading Level 2 of main file",
-                  "{!resources/header.md!}"]
-        result_lines = self.processor.run(source)
+    source = [
+        "Source file",
+        "# Heading Level 1 of main file",
+        "{!resources/header.md!}",
+        "## Heading Level 2 of main file",
+        "{!resources/header.md!}",
+    ]
+    result_lines = processor.run(source)
 
-        self.assertEqual(9, len(result_lines))
+    assert len(result_lines) == 9

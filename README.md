@@ -11,6 +11,11 @@ This module can now be installed using ``pip``.
 
     pip install markdown-include
 
+## Tests
+Use the unittest module
+```bash
+python -m unittest discover unittests/
+```
 
 ## Usage
 This module can be used in a program in the following way:

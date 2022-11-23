@@ -82,7 +82,7 @@ class IncludePreprocessor(Preprocessor):
             for loc, line in enumerate(lines):
                 m = INC_SYNTAX.search(line)
 
-                if m:
+                while m:
                     filename = m.group(1)
                     filename = os.path.expanduser(filename)
                     if not os.path.isabs(filename):
@@ -91,7 +91,7 @@ class IncludePreprocessor(Preprocessor):
                         )
                     try:
                         with open(filename, 'r', encoding=self.encoding) as r:
-                            text = r.readlines()
+                            text = self.run(r.readlines())
                             
                     except Exception as e:
                         if not self.throwException:
@@ -102,7 +102,6 @@ class IncludePreprocessor(Preprocessor):
                         else:
                             raise e
 
-                    line_split = INC_SYNTAX.split(line)
                     if len(text) == 0:
                         text.append('')
                     for i in range(len(text)):
@@ -116,12 +115,12 @@ class IncludePreprocessor(Preprocessor):
                                     text[i] = '#' * self.headingOffset + text[i]
                         else:
                             text[i] = text[i].rstrip('\r\n')
-                            
-                    text[0] = line_split[0] + text[0]
-                    text[-1] = text[-1] + line_split[2]
-                    lines = lines[:loc] + text + lines[loc+1:]
-                    break
-                    
+                    text_to_insert = '\r\n'.join(text)
+                    line = line[:m.start()] + text_to_insert.strip() + line[m.end():]
+                    del lines[loc]
+                    lines[loc:loc] = line.split('\r\n')
+                    m = INC_SYNTAX.search(line)
+
                 else:
                     h = HEADING_SYNTAX.search(line)
                     if h:

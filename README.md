@@ -47,6 +47,30 @@ Markdown is being called. If you would like to change the directory relative to
 which paths are evaluated, then this can be done by specifying the extension
 setting ``base_path``.
 
+### Line Ranges
+
+You can also define specific lines or line ranges to include by specifying `lines`:
+
+```Markdown
+{!filename!lines=1  3 8-10  2}
+```
+
+`lines` takes a sequence of integers separated by spaces (one or more), or it can also
+take line ranges specified with a start line and an end line separated by a dash (`-`).
+
+In the example above, it would read the file called `filename` and include the lines
+`1`, `3`, `8`, `9`, `10`, `2`.
+
+Notice that line `9` was not explicitly set. But it was still included as part of the
+range `8-10`.
+
+Also, notice that line `2` is set *after* the range `8-10`. This means that the
+line `2` in `filename` will be included *after* (below) the range `8-10`.
+
+You can use this to include lines in a different order than the original file. But it
+also means that if you want to preserve the original order, you have to pay attention
+to the order in which you specify the lines.
+
 ## Configuration
 
 The following settings can be specified when initialising the plugin.

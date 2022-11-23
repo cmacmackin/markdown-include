@@ -29,7 +29,7 @@ from codecs import open
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 
-INC_SYNTAX = re.compile(r'\{!\s*(.+?)\s*!\}')
+INC_SYNTAX = re.compile(r'{!\s*(.+?)\s*!((\blines\b)=([0-9 -]+))?\}')
 HEADING_SYNTAX = re.compile( '^#+' )
 
 
@@ -91,7 +91,7 @@ class IncludePreprocessor(Preprocessor):
                         )
                     try:
                         with open(filename, 'r', encoding=self.encoding) as r:
-                            text = self.run(r.readlines())
+                            original_text = self.run(r.readlines())
                             
                     except Exception as e:
                         if not self.throwException:
@@ -101,6 +101,46 @@ class IncludePreprocessor(Preprocessor):
                             break
                         else:
                             raise e
+                    if m.group(2) is None:
+                        text = original_text
+                    else:
+                        lines_str = m.group(4)
+                        lines_blocks = lines_str.split()
+                        wanted_lines = []
+                        for block in lines_blocks:
+                            if "-" in block:
+                                start, end = block.strip().split("-")
+                                current_start = int(start)
+                                current_end = int(end)
+                                if not len(original_text) >= current_end:
+                                    current_end = len(original_text)
+                                    print(
+                                        f"Warning: line range: {block} ending in "
+                                        f"line: {end} is larger than file: {filename} "
+                                        f"using end: {current_end}"
+                                    )
+                                if not current_start <= current_end:
+                                    current_start = max(current_end - 1, 1)
+                                    print(
+                                        f"Warning: in line range: {block} "
+                                        f"the start line: {start} is not "
+                                        f"smaller than the end line: {current_end} "
+                                        f"using start: {current_start}"
+                                    )
+                                
+                                wanted_lines.extend(original_text[current_start-1:current_end])
+                            else:
+                                wanted_line = int(block.strip())
+                                current_line = wanted_line
+                                if current_line > len(original_text):
+                                    current_line = len(original_text)
+                                    print(
+                                        f"Warning: line: {wanted_line} is larger than "
+                                        f"file: {filename} using end: {current_line}"
+                                    )
+                                wanted_lines.append(original_text[current_line-1])
+                        text = wanted_lines
+
 
                     if len(text) == 0:
                         text.append('')

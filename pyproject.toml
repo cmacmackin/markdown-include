@@ -40,3 +40,5 @@ packages = ["markdown_include"]
 
 [tool.setuptools.dynamic]
 version = { attr = "setuptools_scm.get_version" }
+
+[tool.black]

@@ -142,3 +142,51 @@ def test_processor_lines():
     result_lines = processor.run(source)
 
     assert len(result_lines) == 9
+
+
+def test_include_lines(markdown_include):
+    source = "{!resources/longer.md!lines=1 3}"
+    html = markdown.markdown(source, extensions=[markdown_include])
+
+    assert html == dedent(
+        """\
+        <p>This is line 1
+        This is line 3</p>"""
+    )
+
+
+def test_include_line_range(markdown_include):
+    source = "{!resources/longer.md!lines=3-5}"
+    html = markdown.markdown(source, extensions=[markdown_include])
+
+    assert html == dedent(
+        """\
+        <p>This is line 3
+        This is line 4
+        This is line 5</p>"""
+    )
+
+
+def test_include_lines_and_line_range(markdown_include):
+    source = "{!resources/longer.md!lines=1 3-5 8}"
+    html = markdown.markdown(source, extensions=[markdown_include])
+
+    assert html == dedent(
+        """\
+        <p>This is line 1
+        This is line 3
+        This is line 4
+        This is line 5
+        This is line 8</p>"""
+    )
+
+
+def test_include_lines_out_of_order(markdown_include):
+    source = "{!resources/longer.md!lines=3 1}"
+    html = markdown.markdown(source, extensions=[markdown_include])
+
+    assert html == dedent(
+        """\
+        <p>This is line 3
+        This is line 1</p>"""
+    )

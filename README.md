@@ -11,6 +11,11 @@ This module can now be installed using ``pip``.
 
     pip install markdown-include
 
+## Tests
+Use the unittest module
+```bash
+python -m unittest discover unittests/
+```
 
 ## Usage
 This module can be used in a program in the following way:
@@ -18,6 +23,14 @@ This module can be used in a program in the following way:
 ```python
 import markdown
 html = markdown.markdown(source, extensions=['markdown_include.include'])
+```
+
+Markdown-Include can also be included in MkDocs projects like below:
+
+```yaml
+markdown_extensions:
+    - markdown_include.include:
+        base_path: docs
 ```
 
 The syntax for use within your Markdown files is ``{!filename!}``. This
@@ -136,6 +149,9 @@ produces
 
 
 ## ChangeLog
+### Version 0.7.0
+Modified to work with Python-Markdown 3.4. This makes the plugin
+incompatible with versions < 3.0.
 ### Version 0.6.0
 - Added ability ot offset headers in the included file so they fall under the header level in which the include occurs
 - Add option to throw exception when can't find an include file (instead of printing a warning)

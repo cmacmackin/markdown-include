@@ -1,0 +1,37 @@
+[build-system]
+requires = [
+    "setuptools >= 61.0.0",
+    "setuptools_scm[toml] >= 6.2",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "markdown-include"
+description = "A Python-Markdown extension which provides an 'include' function"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Topic :: Internet :: WWW/HTTP :: Site Management",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Text Processing :: Filters",
+    "Topic :: Text Processing :: Markup :: HTML",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+]
+keywords = ["Markdown", "typesetting", "include", "plugin", "extension"]
+license = {text = "GNU General Public License v3 (GPLv3)"}
+authors = [{name = "Chris MacMackin", email = "cmacmackin@gmail.com"}]
+urls = {project = "https://github.com/cmacmackin/markdown-include"}
+dependencies = [
+    "markdown>=3.0",
+]
+dynamic = ["version"]
+
+[tool.setuptools]
+packages = ["markdown_include"]
+
+[tool.setuptools.dynamic]
+version = { attr = "setuptools_scm.get_version" }

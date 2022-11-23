@@ -29,8 +29,8 @@ from codecs import open
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 
-INC_SYNTAX = re.compile(r'\{!\s*(.+?)\s*!\}')
-HEADING_SYNTAX = re.compile( '^#+' )
+INC_SYNTAX = re.compile(r'\{!\s*(.+?)(#[\w\s-]+?)?\s*!\}')
+HEADING_SYNTAX = re.compile(r'^#+')
 
 
 class MarkdownInclude(Extension):
@@ -77,27 +77,28 @@ class IncludePreprocessor(Preprocessor):
 
     def run(self, lines):
         done = False
-        bonusHeading = ''
+        bonus_heading = ''
         while not done:
             for loc, line in enumerate(lines):
                 m = INC_SYNTAX.search(line)
 
                 if m:
                     filename = m.group(1)
+                    file_section = m.group(2) if len(m.groups()) > 1 else None
                     filename = os.path.expanduser(filename)
                     if not os.path.isabs(filename):
                         filename = os.path.normpath(
-                            os.path.join(self.base_path,filename)
+                            os.path.join(self.base_path, filename)
                         )
                     try:
-                        with open(filename, 'r', encoding=self.encoding) as r:
+                        with open(filename, encoding=self.encoding) as r:
                             text = r.readlines()
                             
                     except Exception as e:
                         if not self.throwException:
                             print('Warning: could not find file {}. Ignoring '
                                   'include statement. Error: {}'.format(filename, e))
-                            lines[loc] = INC_SYNTAX.sub('',line)
+                            lines[loc] = INC_SYNTAX.sub('', line)
                             break
                         else:
                             raise e
@@ -109,29 +110,31 @@ class IncludePreprocessor(Preprocessor):
                         # Strip the newline, and optionally increase header depth
                         if self.inheritHeadingDepth or self.headingOffset:
                             if HEADING_SYNTAX.search(text[i]):
+                                if file_section and file_section not in text[i].strip():
+                                    continue
                                 text[i] = text[i].rstrip('\r\n')
                                 if self.inheritHeadingDepth:
-                                    text[i] = bonusHeading + text[i]
+                                    text[i] = bonus_heading + text[i]
                                 if self.headingOffset:
                                     text[i] = '#' * self.headingOffset + text[i]
                         else:
                             text[i] = text[i].rstrip('\r\n')
                             
                     text[0] = line_split[0] + text[0]
-                    text[-1] = text[-1] + line_split[2]
+                    text[-1] += line_split[2]
                     lines = lines[:loc] + text + lines[loc+1:]
                     break
                     
                 else:
                     h = HEADING_SYNTAX.search(line)
                     if h:
-                        headingDepth = len(h.group(0))
-                        bonusHeading = '#' * headingDepth
+                        heading_depth = len(h.group(0))
+                        bonus_heading = '#' * heading_depth
                 
             else:
                 done = True
         return lines
 
 
-def makeExtension(*args,**kwargs):
+def makeExtension(*args, **kwargs):
     return MarkdownInclude(kwargs)

@@ -30,6 +30,11 @@ dependencies = [
 ]
 dynamic = ["version"]
 
+[project.optional-dependencies]
+tests = [
+    "pytest",
+]
+
 [tool.setuptools]
 packages = ["markdown_include"]
 

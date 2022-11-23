@@ -1,6 +1,7 @@
 [build-system]
 requires = [
     "setuptools >= 61.0.0",
+    "setuptools_scm[toml] >= 6.2",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -27,7 +28,10 @@ urls = {project = "https://github.com/cmacmackin/markdown-include"}
 dependencies = [
     "markdown>=3.0",
 ]
-version = "0.7.0"
+dynamic = ["version"]
 
 [tool.setuptools]
 packages = ["markdown_include"]
+
+[tool.setuptools.dynamic]
+version = { attr = "setuptools_scm.get_version" }

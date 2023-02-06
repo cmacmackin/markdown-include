@@ -111,12 +111,12 @@ def test_headers_inherit_heading_depth(markdown_include_inherit_heading_depth):
         <p>Source file</p>
         <h1>Heading Level 1 of main file</h1>
         <h2>This heading will be one level deeper from the previous heading</h2>
-        <p>More included file content.</p>
-        <p>End of included content.</p>
+        <p>More included file content.
+        End of included content.</p>
         <h2>Heading Level 2 of main file</h2>
         <h3>This heading will be one level deeper from the previous heading</h3>
-        <p>More included file content.</p>
-        <p>End of included content.</p>"""
+        <p>More included file content.
+        End of included content.</p>"""
     )
 
 
@@ -190,3 +190,12 @@ def test_include_lines_out_of_order(markdown_include):
         <p>This is line 3
         This is line 1</p>"""
     )
+
+
+def test_nested_table(markdown_include_inherit_heading_depth):
+    source = "{!table_inner.md!}"
+    html = markdown.markdown(
+        source, extensions=[markdown_include_inherit_heading_depth, "tables"]
+    )
+
+    assert "<table>" in html

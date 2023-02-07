@@ -7,7 +7,7 @@ from textwrap import dedent
 import pytest
 
 
-RESOURCE_DIR = pathlib.Path(__file__).parent.absolute()
+RESOURCE_DIR = pathlib.Path(__file__).parent.absolute() / "resources"
 
 
 @pytest.fixture(scope="module")
@@ -23,14 +23,14 @@ def markdown_include_inherit_heading_depth():
 
 
 def test_single_include(markdown_include):
-    source = "{!resources/simple.md!}"
+    source = "{!simple.md!}"
     html = markdown.markdown(source, extensions=[markdown_include])
 
     assert html == "<p>This is a simple template</p>"
 
 
 def test_double_include(markdown_include):
-    source = "{!resources/simple.md!} and {!resources/simple_2.md!}"
+    source = "{!simple.md!} and {!simple_2.md!}"
     html = markdown.markdown(source, extensions=[markdown_include])
 
     assert (
@@ -42,9 +42,9 @@ def test_headers(markdown_include):
     source = (
         "Source file\n"
         "# Heading Level 1 of main file\n"
-        "{!resources/header.md!}\n"
+        "{!header.md!}\n"
         "## Heading Level 2 of main file\n"
-        "{!resources/header.md!}"
+        "{!header.md!}"
     )
 
     html = markdown.markdown(source, extensions=[markdown_include])
@@ -64,7 +64,7 @@ def test_headers(markdown_include):
 
 
 def test_embedded_template(markdown_include):
-    source = "{!resources/template_inside.md!}"
+    source = "{!template_inside.md!}"
     html = markdown.markdown(source, extensions=[markdown_include])
 
     assert (
@@ -74,7 +74,7 @@ def test_embedded_template(markdown_include):
 
 
 def test_single_include_inherit_heading_depth(markdown_include_inherit_heading_depth):
-    source = "{!resources/simple.md!}"
+    source = "{!simple.md!}"
     html = markdown.markdown(
         source, extensions=[markdown_include_inherit_heading_depth]
     )
@@ -83,7 +83,7 @@ def test_single_include_inherit_heading_depth(markdown_include_inherit_heading_d
 
 
 def test_double_include_inherit_heading_depth(markdown_include_inherit_heading_depth):
-    source = "{!resources/simple.md!} and {!resources/simple_2.md!}"
+    source = "{!simple.md!} and {!simple_2.md!}"
     html = markdown.markdown(
         source, extensions=[markdown_include_inherit_heading_depth]
     )
@@ -97,9 +97,9 @@ def test_headers_inherit_heading_depth(markdown_include_inherit_heading_depth):
     source = (
         "Source file\n"
         "# Heading Level 1 of main file\n"
-        "{!resources/header.md!}\n"
+        "{!header.md!}\n"
         "## Heading Level 2 of main file\n"
-        "{!resources/header.md!}"
+        "{!header.md!}"
     )
 
     html = markdown.markdown(
@@ -111,12 +111,12 @@ def test_headers_inherit_heading_depth(markdown_include_inherit_heading_depth):
         <p>Source file</p>
         <h1>Heading Level 1 of main file</h1>
         <h2>This heading will be one level deeper from the previous heading</h2>
-        <p>More included file content.</p>
-        <p>End of included content.</p>
+        <p>More included file content.
+        End of included content.</p>
         <h2>Heading Level 2 of main file</h2>
         <h3>This heading will be one level deeper from the previous heading</h3>
-        <p>More included file content.</p>
-        <p>End of included content.</p>"""
+        <p>More included file content.
+        End of included content.</p>"""
     )
 
 
@@ -135,9 +135,9 @@ def test_processor_lines():
     source = [
         "Source file",
         "# Heading Level 1 of main file",
-        "{!resources/header.md!}",
+        "{!header.md!}",
         "## Heading Level 2 of main file",
-        "{!resources/header.md!}",
+        "{!header.md!}",
     ]
     result_lines = processor.run(source)
 
@@ -145,7 +145,7 @@ def test_processor_lines():
 
 
 def test_include_lines(markdown_include):
-    source = "{!resources/longer.md!lines=1 3}"
+    source = "{!longer.md!lines=1 3}"
     html = markdown.markdown(source, extensions=[markdown_include])
 
     assert html == dedent(
@@ -156,7 +156,7 @@ def test_include_lines(markdown_include):
 
 
 def test_include_line_range(markdown_include):
-    source = "{!resources/longer.md!lines=3-5}"
+    source = "{!longer.md!lines=3-5}"
     html = markdown.markdown(source, extensions=[markdown_include])
 
     assert html == dedent(
@@ -168,7 +168,7 @@ def test_include_line_range(markdown_include):
 
 
 def test_include_lines_and_line_range(markdown_include):
-    source = "{!resources/longer.md!lines=1 3-5 8}"
+    source = "{!longer.md!lines=1 3-5 8}"
     html = markdown.markdown(source, extensions=[markdown_include])
 
     assert html == dedent(
@@ -182,7 +182,7 @@ def test_include_lines_and_line_range(markdown_include):
 
 
 def test_include_lines_out_of_order(markdown_include):
-    source = "{!resources/longer.md!lines=3 1}"
+    source = "{!longer.md!lines=3 1}"
     html = markdown.markdown(source, extensions=[markdown_include])
 
     assert html == dedent(
@@ -190,3 +190,12 @@ def test_include_lines_out_of_order(markdown_include):
         <p>This is line 3
         This is line 1</p>"""
     )
+
+
+def test_nested_table(markdown_include_inherit_heading_depth):
+    source = "{!table_inner.md!}"
+    html = markdown.markdown(
+        source, extensions=[markdown_include_inherit_heading_depth, "tables"]
+    )
+
+    assert "<table>" in html

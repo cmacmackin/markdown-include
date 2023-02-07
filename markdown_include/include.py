@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 #  include.py
@@ -166,19 +165,17 @@ class IncludePreprocessor(Preprocessor):
                         text.append("")
                     for i in range(len(text)):
                         # Strip the newline, and optionally increase header depth
-                        if self.inheritHeadingDepth or self.headingOffset:
-                            if HEADING_SYNTAX.search(text[i]):
-                                text[i] = text[i].rstrip("\r\n")
-                                if self.inheritHeadingDepth:
-                                    text[i] = bonusHeading + text[i]
-                                if self.headingOffset:
-                                    text[i] = "#" * self.headingOffset + text[i]
-                        else:
-                            text[i] = text[i].rstrip("\r\n")
+                        if HEADING_SYNTAX.search(text[i]):
+                            if self.inheritHeadingDepth:
+                                text[i] = bonusHeading + text[i]
+                            if self.headingOffset:
+                                text[i] = "#" * self.headingOffset + text[i]
+
+                        text[i] = text[i].rstrip("\r\n")
                     text_to_insert = "\r\n".join(text)
                     line = line[: m.start()] + text_to_insert.strip() + line[m.end() :]
                     del lines[loc]
-                    lines[loc:loc] = line.split("\r\n")
+                    lines[loc:loc] = line.splitlines()
                     m = INC_SYNTAX.search(line)
 
                 else:

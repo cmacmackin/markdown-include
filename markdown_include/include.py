@@ -24,6 +24,8 @@
 from __future__ import print_function
 import re
 import os.path
+import tempfile
+import urllib.request
 from codecs import open
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
@@ -94,99 +96,125 @@ class IncludePreprocessor(Preprocessor):
     def run(self, lines):
         done = False
         bonusHeading = ""
-        while not done:
-            for loc, line in enumerate(lines):
-                m = INC_SYNTAX.search(line)
-
-                while m:
-                    filename = m.group(1)
-                    filename = os.path.expanduser(filename)
-                    if not os.path.isabs(filename):
-                        filename = os.path.normpath(
-                            os.path.join(self.base_path, filename)
-                        )
-                    try:
-                        with open(filename, "r", encoding=self.encoding) as r:
-                            original_text = self.run(r.readlines())
-
-                    except Exception as e:
-                        if not self.throwException:
-                            print(
-                                "Warning: could not find file {}. Ignoring "
-                                "include statement. Error: {}".format(filename, e)
-                            )
-                            lines[loc] = INC_SYNTAX.sub("", line)
-                            break
-                        else:
-                            raise e
-                    if m.group(2) is None:
-                        text = original_text
-                    else:
-                        lines_str = m.group(4)
-                        lines_blocks = lines_str.split()
-                        wanted_lines = []
-                        for block in lines_blocks:
-                            if "-" in block:
-                                start, end = block.strip().split("-")
-                                current_start = int(start)
-                                current_end = int(end)
-                                if not len(original_text) >= current_end:
-                                    current_end = len(original_text)
-                                    print(
-                                        f"Warning: line range: {block} ending in "
-                                        f"line: {end} is larger than file: {filename} "
-                                        f"using end: {current_end}"
-                                    )
-                                if not current_start <= current_end:
-                                    current_start = max(current_end - 1, 1)
-                                    print(
-                                        f"Warning: in line range: {block} "
-                                        f"the start line: {start} is not "
-                                        f"smaller than the end line: {current_end} "
-                                        f"using start: {current_start}"
-                                    )
-
-                                wanted_lines.extend(
-                                    original_text[current_start - 1 : current_end]
-                                )
-                            else:
-                                wanted_line = int(block.strip())
-                                current_line = wanted_line
-                                if current_line > len(original_text):
-                                    current_line = len(original_text)
-                                    print(
-                                        f"Warning: line: {wanted_line} is larger than "
-                                        f"file: {filename} using end: {current_line}"
-                                    )
-                                wanted_lines.append(original_text[current_line - 1])
-                        text = wanted_lines
-
-                    if len(text) == 0:
-                        text.append("")
-                    for i in range(len(text)):
-                        # Strip the newline, and optionally increase header depth
-                        if HEADING_SYNTAX.search(text[i]):
-                            if self.inheritHeadingDepth:
-                                text[i] = bonusHeading + text[i]
-                            if self.headingOffset:
-                                text[i] = "#" * self.headingOffset + text[i]
-
-                        text[i] = text[i].rstrip("\r\n")
-                    text_to_insert = "\r\n".join(text)
-                    line = line[: m.start()] + text_to_insert.strip() + line[m.end() :]
-                    del lines[loc]
-                    lines[loc:loc] = line.splitlines()
+        files = []
+        try:
+            while not done:
+                for loc, line in enumerate(lines):
                     m = INC_SYNTAX.search(line)
 
-                else:
-                    h = HEADING_SYNTAX.search(line)
-                    if h:
-                        headingDepth = len(h.group(0))
-                        bonusHeading = "#" * headingDepth
+                    while m:
+                        filename = m.group(1)
+                        if filename.startswith("https://"):
+                            filename = self.load_remote(filename)
+                            files.append(filename)
+                        filename = os.path.expanduser(filename)
+                        if not os.path.isabs(filename):
+                            filename = os.path.normpath(
+                                os.path.join(self.base_path, filename)
+                            )
+                        try:
+                            with open(filename, "r", encoding=self.encoding) as r:
+                                original_text = self.run(r.readlines())
 
-            else:
-                done = True
+                        except Exception as e:
+                            if not self.throwException:
+                                print(
+                                    "Warning: could not find file {}. Ignoring "
+                                    "include statement. Error: {}".format(filename, e)
+                                )
+                                lines[loc] = INC_SYNTAX.sub("", line)
+                                break
+                            else:
+                                raise e
+                        if m.group(2) is None:
+                            text = original_text
+                        else:
+                            lines_str = m.group(4)
+                            lines_blocks = lines_str.split()
+                            wanted_lines = []
+                            for block in lines_blocks:
+                                if "-" in block:
+                                    start, end = block.strip().split("-")
+                                    current_start = int(start)
+                                    current_end = int(end)
+                                    if not len(original_text) >= current_end:
+                                        current_end = len(original_text)
+                                        print(
+                                            f"Warning: line range: {block} ending in "
+                                            f"line: {end} is larger than file: {filename} "
+                                            f"using end: {current_end}"
+                                        )
+                                    if not current_start <= current_end:
+                                        current_start = max(current_end - 1, 1)
+                                        print(
+                                            f"Warning: in line range: {block} "
+                                            f"the start line: {start} is not "
+                                            f"smaller than the end line: {current_end} "
+                                            f"using start: {current_start}"
+                                        )
+
+                                    wanted_lines.extend(
+                                        original_text[current_start - 1 : current_end]
+                                    )
+                                else:
+                                    wanted_line = int(block.strip())
+                                    current_line = wanted_line
+                                    if current_line > len(original_text):
+                                        current_line = len(original_text)
+                                        print(
+                                            f"Warning: line: {wanted_line} is larger than "
+                                            f"file: {filename} using end: {current_line}"
+                                        )
+                                    wanted_lines.append(original_text[current_line - 1])
+                            text = wanted_lines
+
+                        if len(text) == 0:
+                            text.append("")
+                        for i in range(len(text)):
+                            # Strip the newline, and optionally increase header depth
+                            if HEADING_SYNTAX.search(text[i]):
+                                if self.inheritHeadingDepth:
+                                    text[i] = bonusHeading + text[i]
+                                if self.headingOffset:
+                                    text[i] = "#" * self.headingOffset + text[i]
+
+                            text[i] = text[i].rstrip("\r\n")
+                        text_to_insert = "\r\n".join(text)
+                        line = (
+                            line[: m.start()] + text_to_insert.strip() + line[m.end() :]
+                        )
+                        del lines[loc]
+                        lines[loc:loc] = line.splitlines()
+                        m = INC_SYNTAX.search(line)
+
+                    else:
+                        h = HEADING_SYNTAX.search(line)
+                        if h:
+                            headingDepth = len(h.group(0))
+                            bonusHeading = "#" * headingDepth
+
+                else:
+                    done = True
+        finally:
+            # clean up any temp files we created
+            for file in files:
+                os.remove(file)
         return lines
+
+    def load_remote(self, filename):
+        name = None
+        # do not delete on close as we open it later on
+        with tempfile.NamedTemporaryFile(mode="wb", delete=False) as file:
+            name = file.name
+            try:
+                urlopen = urllib.request.urlopen(filename)
+                data = urlopen.read()
+                file.write(data)
+            except urllib.error.HTTPError as e:
+                file.write(
+                    bytes(f"Error loading remote template ({filename}): {e}", "utf-8")
+                )
+        return name
 
 
 def makeExtension(*args, **kwargs):

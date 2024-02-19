@@ -30,6 +30,7 @@ from markdown.preprocessors import Preprocessor
 
 INC_SYNTAX = re.compile(r"{!\s*(.+?)\s*!((\blines\b)=([0-9 -]+))?\}")
 HEADING_SYNTAX = re.compile("^#+")
+LINK_SYNTAX = re.compile("(!|)\[[^]]+]\(([^)]+)\)")
 
 
 class MarkdownInclude(Extension):
@@ -99,8 +100,8 @@ class IncludePreprocessor(Preprocessor):
                 m = INC_SYNTAX.search(line)
 
                 while m:
-                    filename = m.group(1)
-                    filename = os.path.expanduser(filename)
+                    relative_filename = m.group(1)
+                    filename = os.path.expanduser(relative_filename)
                     if not os.path.isabs(filename):
                         filename = os.path.normpath(
                             os.path.join(self.base_path, filename)
@@ -170,6 +171,16 @@ class IncludePreprocessor(Preprocessor):
                                 text[i] = bonusHeading + text[i]
                             if self.headingOffset:
                                 text[i] = "#" * self.headingOffset + text[i]
+                        link = LINK_SYNTAX.search(text[i])
+                        if link:
+                            raw_path = link.group(2)
+                            if not raw_path.startswith("http"):
+                                path_ = f"{os.path.dirname(relative_filename)}{os.path.sep}{raw_path}"
+                                text[i] = (
+                                    text[i][: link.start(2)]
+                                    + path_
+                                    + text[i][link.end(2) :]
+                                )
 
                         text[i] = text[i].rstrip("\r\n")
                     text_to_insert = "\r\n".join(text)

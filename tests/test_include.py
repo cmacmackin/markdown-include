@@ -6,7 +6,6 @@ from textwrap import dedent
 
 import pytest
 
-
 RESOURCE_DIR = pathlib.Path(__file__).parent.absolute() / "resources"
 
 
@@ -22,6 +21,33 @@ def markdown_include_inherit_heading_depth():
     )
 
 
+def test_relative_path(markdown_include):
+    source = "{!docs/template/template.md!}"
+    html = markdown.markdown(source, extensions=[markdown_include])
+
+    assert html == "<p><img alt=\"some_image.jpg\" src=\"docs/template/some_image.jpg\" /></p>"
+
+
+def test_relative_path_parent(markdown_include):
+    source = "{!docs/template/template_2.md!}"
+    html = markdown.markdown(source, extensions=[markdown_include])
+
+    assert html == "<p><img alt=\"some_image.jpg\" src=\"docs/template/../images/image1.jpg\" /></p>"
+
+
+def test_relative_path_url_link(markdown_include):
+    source = "{!with_link.md!}"
+    html = markdown.markdown(source, extensions=[markdown_include])
+
+    assert html == "<p><a href=\"https://google.com\">some link</a></p>"
+
+def test_relative_path_img_url_link(markdown_include):
+    source = "{!with_img_link.md!}"
+    html = markdown.markdown(source, extensions=[markdown_include])
+
+    assert html == "<p><img alt=\"some link\" src=\"https://google.com\" /></p>"
+
+
 def test_single_include(markdown_include):
     source = "{!simple.md!}"
     html = markdown.markdown(source, extensions=[markdown_include])
@@ -34,7 +60,7 @@ def test_double_include(markdown_include):
     html = markdown.markdown(source, extensions=[markdown_include])
 
     assert (
-        html == "<p>This is a simple template and This is another simple template</p>"
+            html == "<p>This is a simple template and This is another simple template</p>"
     )
 
 
@@ -68,8 +94,8 @@ def test_embedded_template(markdown_include):
     html = markdown.markdown(source, extensions=[markdown_include])
 
     assert (
-        html
-        == "<p>This is a simple template</p>\n<p>This is a template with a template.</p>"
+            html
+            == "<p>This is a simple template</p>\n<p>This is a template with a template.</p>"
     )
 
 
@@ -89,7 +115,7 @@ def test_double_include_inherit_heading_depth(markdown_include_inherit_heading_d
     )
 
     assert (
-        html == "<p>This is a simple template and This is another simple template</p>"
+            html == "<p>This is a simple template and This is another simple template</p>"
     )
 
 

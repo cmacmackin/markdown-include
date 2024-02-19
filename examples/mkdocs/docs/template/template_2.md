@@ -1,0 +1,1 @@
+![some_image.jpg](../images/image1.jpg)

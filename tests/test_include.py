@@ -6,7 +6,6 @@ from textwrap import dedent
 
 import pytest
 
-
 RESOURCE_DIR = pathlib.Path(__file__).parent.absolute() / "resources"
 
 
@@ -22,6 +21,20 @@ def markdown_include_inherit_heading_depth():
     )
 
 
+def test_include_remote(markdown_include):
+    source = "{!https://raw.githubusercontent.com/cmacmackin/markdown-include/master/tests/resources/simple.md!}"
+    html = markdown.markdown(source, extensions=[markdown_include])
+
+    assert html == "<p>This is a simple template</p>"
+
+
+def test_include_remote_not_found(markdown_include):
+    source = "{!https://example.com/cmacmackin/markdown-include/master/tests/resources/not_found.md!}"
+    html = markdown.markdown(source, extensions=[markdown_include])
+
+    assert html == "<p>Error loading remote template (https://example.com/cmacmackin/markdown-include/master/tests/resources/not_found.md): HTTP Error 404: Not Found</p>"
+
+
 def test_single_include(markdown_include):
     source = "{!simple.md!}"
     html = markdown.markdown(source, extensions=[markdown_include])
@@ -34,7 +47,7 @@ def test_double_include(markdown_include):
     html = markdown.markdown(source, extensions=[markdown_include])
 
     assert (
-        html == "<p>This is a simple template and This is another simple template</p>"
+            html == "<p>This is a simple template and This is another simple template</p>"
     )
 
 
@@ -68,8 +81,8 @@ def test_embedded_template(markdown_include):
     html = markdown.markdown(source, extensions=[markdown_include])
 
     assert (
-        html
-        == "<p>This is a simple template</p>\n<p>This is a template with a template.</p>"
+            html
+            == "<p>This is a simple template</p>\n<p>This is a template with a template.</p>"
     )
 
 
@@ -89,7 +102,7 @@ def test_double_include_inherit_heading_depth(markdown_include_inherit_heading_d
     )
 
     assert (
-        html == "<p>This is a simple template and This is another simple template</p>"
+            html == "<p>This is a simple template and This is another simple template</p>"
     )
 
 

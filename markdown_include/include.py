@@ -180,7 +180,9 @@ class IncludePreprocessor(Preprocessor):
 
                             text[i] = text[i].rstrip("\r\n")
                         text_to_insert = "\r\n".join(text)
-                        line = line[: m.start()] + text_to_insert.strip() + line[m.end() :]
+                        line = (
+                            line[: m.start()] + text_to_insert.strip() + line[m.end() :]
+                        )
                         del lines[loc]
                         lines[loc:loc] = line.splitlines()
                         m = INC_SYNTAX.search(line)
@@ -202,14 +204,16 @@ class IncludePreprocessor(Preprocessor):
     def load_remote(self, filename):
         name = None
         # do not delete on close as we open it later on
-        with tempfile.NamedTemporaryFile(mode='wb', delete=False) as file:
+        with tempfile.NamedTemporaryFile(mode="wb", delete=False) as file:
             name = file.name
             try:
                 urlopen = urllib.request.urlopen(filename)
                 data = urlopen.read()
                 file.write(data)
             except urllib.error.HTTPError as e:
-                file.write(bytes(f"Error loading remote template ({filename}): {e}", "utf-8"))
+                file.write(
+                    bytes(f"Error loading remote template ({filename}): {e}", "utf-8")
+                )
         return name
 
 

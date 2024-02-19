@@ -176,7 +176,11 @@ class IncludePreprocessor(Preprocessor):
                             raw_path = link.group(2)
                             if not raw_path.startswith("http"):
                                 path_ = f"{os.path.dirname(relative_filename)}{os.path.sep}{raw_path}"
-                                text[i] = text[i][:link.start(2)] + path_ + text[i][link.end(2):]
+                                text[i] = (
+                                    text[i][: link.start(2)]
+                                    + path_
+                                    + text[i][link.end(2) :]
+                                )
 
                         text[i] = text[i].rstrip("\r\n")
                     text_to_insert = "\r\n".join(text)

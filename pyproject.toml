@@ -19,12 +19,11 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Text Processing :: Filters",
     "Topic :: Text Processing :: Markup :: HTML",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
 ]
 keywords = ["Markdown", "typesetting", "include", "plugin", "extension"]
-license = {text = "GNU General Public License v3 (GPLv3)"}
+license = "GPL-3.0-only"
 authors = [{name = "Chris MacMackin", email = "cmacmackin@gmail.com"}]
-urls = {project = "https://github.com/cmacmackin/markdown-include"}
+urls = {homepage = "https://github.com/cmacmackin/markdown-include"}
 dependencies = [
     "markdown>=3.0",
 ]
